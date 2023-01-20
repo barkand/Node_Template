@@ -47,7 +47,7 @@ const SeenNotify = async (user_id: string, item_id: number) => {
 
     return response.success;
   } catch (e: any) {
-    logger.error(`${path}SaveNotify: ${e}`);
+    logger.error(`${path}SeenNotify: ${e}`);
     return response.error;
   }
 };
@@ -61,7 +61,7 @@ const ActiveNotify = async (item_id: number) => {
 
     return response.success;
   } catch (e: any) {
-    logger.error(`${path}SaveNotify: ${e}`);
+    logger.error(`${path}ActiveNotify: ${e}`);
     return response.error;
   }
 };
