@@ -1,26 +1,31 @@
 import { Notifications } from "../models";
 
-import { Products } from "../../market/models";
 import logger from "../../log";
 import { response } from "../../core";
 
 const path = "Admin>Business>notify>";
 
-const SaveNotify = async (wallet: string, product: string) => {
+const SaveNotify = async (
+  user_id: string,
+  notify: { item_id: number; message: string; refer_link: string }
+) => {
   try {
-    let notify = await Notifications.findOne({
-      user_id: wallet,
-      product_id: product,
+    let _notification = await Notifications.findOne({
+      user_id: user_id,
+      refer_id: notify.item_id,
     });
 
-    if (!notify) {
-      notify = new Notifications({
-        user_id: wallet,
-        product_id: product,
+    if (!_notification) {
+      _notification = new Notifications({
+        user_id: user_id,
+        message: notify.message,
+        refer_id: notify.item_id,
+        refer_link: notify.refer_link,
         seen: false,
+        active: false,
       });
 
-      await notify.save();
+      await _notification.save();
     }
 
     return response.success;
@@ -30,9 +35,40 @@ const SaveNotify = async (wallet: string, product: string) => {
   }
 };
 
-const DeleteNotify = async (wallet: string, product: string) => {
+const SeenNotify = async (user_id: string, item_id: number) => {
   try {
-    await Notifications.deleteOne({ user_id: wallet, product_id: product });
+    await Notifications.updateOne(
+      {
+        user_id: user_id,
+        refer_id: item_id,
+      },
+      { $set: { seen: true } }
+    );
+
+    return response.success;
+  } catch (e: any) {
+    logger.error(`${path}SaveNotify: ${e}`);
+    return response.error;
+  }
+};
+
+const ActiveNotify = async (item_id: number) => {
+  try {
+    await Notifications.updateMany(
+      { refer_id: item_id },
+      { $set: { active: true } }
+    );
+
+    return response.success;
+  } catch (e: any) {
+    logger.error(`${path}SaveNotify: ${e}`);
+    return response.error;
+  }
+};
+
+const DeleteNotify = async (user_id: string, item_id: number) => {
+  try {
+    await Notifications.deleteOne({ user_id: user_id, refer_id: item_id });
 
     return response.success;
   } catch (e: any) {
@@ -41,33 +77,18 @@ const DeleteNotify = async (wallet: string, product: string) => {
   }
 };
 
-const GetNotifications = async (wallet: string, lang: string) => {
-  let _notifications: any = [];
-
+const GetNotifications = async (user_id: string) => {
   try {
-    let items = await Notifications.find(
-      { user_id: wallet, seen: false },
+    let _notifications = await Notifications.find(
+      { user_id: user_id, seen: false, active: true },
       { _id: 0 }
     );
 
-    for (let i = 0; i < items.length; i++) {
-      let product: any = await Products.findOne({ id: items[i].product_id });
-      if (product.forSale === true) {
-        _notifications.push({
-          id: product.id,
-          title:
-            lang === "en"
-              ? `${product.nameEn} - ${product.cardEn} (${product.price})`
-              : `${product.name} - ${product.card} (${product.price})`,
-        });
-      }
-    }
-
     return { ...response.success, data: _notifications };
   } catch (e: any) {
-    logger.error(`${path}GetNotify: ${e}`);
-    return { ...response.error, data: _notifications };
+    logger.error(`${path}GetNotifications: ${e}`);
+    return response.error;
   }
 };
 
-export { SaveNotify, DeleteNotify, GetNotifications };
+export { SaveNotify, SeenNotify, ActiveNotify, DeleteNotify, GetNotifications };

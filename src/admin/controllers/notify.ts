@@ -1,37 +1,48 @@
 import { verifyToken } from "../libs/jwt";
-import { SaveNotify, DeleteNotify, GetNotifications } from "../business/notify";
+import { SaveNotify, SeenNotify, DeleteNotify, GetNotifications } from "../business/notify";
 
 class NotifyController {
   saveNotify = async (req: any, res: any) => {
     const { token, wallet } = req.cookies;
-    let { product } = req.body;
+    let { notify } = req.body;
 
     let _verify = await verifyToken(token);
     if (_verify.code !== 200) res.status(_verify.code).send(_verify);
 
-    let _result: any = await SaveNotify(wallet, product);
+    let _result: any = await SaveNotify(wallet, notify);
     res.status(_result.code).send(_result);
   };
 
-  deleteNotify = async (req: any, res: any) => {
+  seenNotify = async (req: any, res: any) => {
     const { token, wallet } = req.cookies;
-    let { product } = req.body;
+    let { item_id } = req.body;
 
     let _verify = await verifyToken(token);
     if (_verify.code !== 200) res.status(_verify.code).send(_verify);
 
-    let _result: any = await DeleteNotify(wallet, product);
+    let _result: any = await SeenNotify(wallet, item_id);
+    res.status(_result.code).send(_result);
+  };
+
+
+  deleteNotify = async (req: any, res: any) => {
+    const { token, wallet } = req.cookies;
+    let { item_id } = req.body;
+
+    let _verify = await verifyToken(token);
+    if (_verify.code !== 200) res.status(_verify.code).send(_verify);
+
+    let _result: any = await DeleteNotify(wallet, item_id);
     res.status(_result.code).send(_result);
   };
 
   getNotifications = async (req: any, res: any) => {
     const { token, wallet } = req.cookies;
-    let { lang } = req.body;
 
     let _verify = await verifyToken(token);
     if (_verify.code !== 200) res.status(_verify.code).send(_verify);
 
-    let _result: any = await GetNotifications(wallet, lang);
+    let _result: any = await GetNotifications(wallet);
     res.status(_result.code).send(_result);
   };
 }
