@@ -23,12 +23,9 @@ dist-ssr
 *.sln
 *.sw?
 
-package-lock.json
 #
-.env
+coverage
+package-lock.json
+
+public/**/*.webp
 .env.production
-
-images-upload
-logs
-
-Dockerfile
