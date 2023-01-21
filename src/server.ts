@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 import setMiddleware from "./core/middleware";
 import routers from "./core/routes";
-import ConnectToDatabase from "./core/database";
+import { ConnectToDatabase, ConnectToCacheDatabase } from "./core/database";
 import logger from "./log";
 
 dotenv.config();
@@ -14,6 +14,7 @@ setMiddleware(app);
 app.use("/api", routers);
 
 ConnectToDatabase();
+ConnectToCacheDatabase();
 
 app.listen(process.env.SERVER_PORT, () => {
   logger.info(`Server is listening on port ${process.env.SERVER_PORT}`);
