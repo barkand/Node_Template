@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-import logger from "../../log";
+import logger from "../../../log";
 
 const ConnectToDatabase = async () => {
   mongoose.set("strictQuery", false);

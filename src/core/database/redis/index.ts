@@ -1,6 +1,6 @@
 import { createClient } from "redis";
 
-import logger from "../../log";
+import logger from "../../../log";
 
 var client: any;
 const ConnectToCacheDatabase = async () => {
