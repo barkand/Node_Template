@@ -4,6 +4,8 @@ import logger from "../../../log";
 
 var client: any;
 const ConnectToCacheDatabase = async () => {
+  if (process.env.DB_CACHE_ACTIVE != "true") return;
+
   const socket: any = {
     host: process.env.DB_CACHE_HOST,
     port: process.env.DB_CACHE_PORT,

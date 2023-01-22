@@ -6,6 +6,7 @@ declare namespace NodeJS {
     DB_NAME: string;
     DB_USER: string;
     DB_PASSWORD: string;
+    DB_CACHE_ACTIVE: string;
     DB_CACHE_HOST: string;
     DB_CACHE_PORT: string;
     DB_CACHE_PASSWORD: string;
