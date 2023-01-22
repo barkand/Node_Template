@@ -15,8 +15,8 @@ npm init --yes
 - Cookie: npm i cookie-parser && npm i -D @types/cookie-parser
 - ImageRest: npm i express-form-data && npm i -D @types/express-form-data
 - Log: npm i morgan winston && npm i -D @types/morgan
-- GQL: npm i graphql @graphql-tools/schema
 - Test: npm i -D chai mocha chai-http && npm i -D @types/mocha @types/chai-http
 - redis: npm i redis
+- GQL: npm i apollo-server-express express-graphql graphql lodash && npm i -D @types/lodash
 
 > npm run start
