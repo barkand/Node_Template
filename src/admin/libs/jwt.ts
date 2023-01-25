@@ -57,7 +57,7 @@ const refreshToken = async (wallet: string, refresh: string) => {
     expiresIn: `${process.env.SECRET_KEY_LIFE_TIME}`,
   });
 
-  return { ...state, token: new_token };
+  return { ...state, data: { token: new_token } };
 };
 
 export { createToken, verifyToken, refreshToken };
