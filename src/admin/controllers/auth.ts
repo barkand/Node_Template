@@ -4,12 +4,15 @@ import { response } from "../../core";
 
 class AuthController {
   login = async (req: any, res: any) => {
-    let { wallet } = req.body;
+    let { params } = req.body;
+    let { wallet } = params;
     let { token, refresh } = await createToken(wallet);
 
     let _result: any = await SaveWallet(wallet);
-    if (_result.code !== 200)
+    if (_result.code !== 200) {
       res.status(_result.code).send({ ..._result, data: { connected: false } });
+      return;
+    }
 
     res
       .cookie("wallet", wallet, {
@@ -37,8 +40,10 @@ class AuthController {
     const { wallet } = req.cookies;
 
     let _result: any = await SaveWallet(wallet);
-    if (_result.code !== 200)
+    if (_result.code !== 200) {
       res.status(_result.code).send({ ..._result, data: { connected: false } });
+      return;
+    }
 
     res
       .cookie("wallet", "", {
@@ -64,7 +69,10 @@ class AuthController {
     const { token, wallet } = req.cookies;
 
     let result = await verifyToken(token);
-    if (result.code !== 200) await SaveWallet(wallet);
+    if (result.code !== 200) {
+      await SaveWallet(wallet);
+      return;
+    }
 
     res.status(result.code).send(result);
   };

@@ -13,7 +13,10 @@ class NotifyController {
     let { notify } = params;
 
     let _verify = await verifyToken(token);
-    if (_verify.code !== 200) res.status(_verify.code).send(_verify);
+    if (_verify.code !== 200) {
+      res.status(_verify.code).send(_verify);
+      return;
+    }
 
     let _result: any = await SaveNotify(wallet, notify);
     res.status(_result.code).send(_result);
@@ -25,7 +28,10 @@ class NotifyController {
     let { item_id } = params;
 
     let _verify = await verifyToken(token);
-    if (_verify.code !== 200) res.status(_verify.code).send(_verify);
+    if (_verify.code !== 200) {
+      res.status(_verify.code).send(_verify);
+      return;
+    }
 
     let _result: any = await SeenNotify(wallet, item_id);
     res.status(_result.code).send(_result);
@@ -37,7 +43,10 @@ class NotifyController {
     let { item_id } = params;
 
     let _verify = await verifyToken(token);
-    if (_verify.code !== 200) res.status(_verify.code).send(_verify);
+    if (_verify.code !== 200) {
+      res.status(_verify.code).send(_verify);
+      return;
+    }
 
     let _result: any = await DeleteNotify(wallet, item_id);
     res.status(_result.code).send(_result);
@@ -47,7 +56,10 @@ class NotifyController {
     const { token, wallet } = req.cookies;
 
     let _verify = await verifyToken(token);
-    if (_verify.code !== 200) res.status(_verify.code).send(_verify);
+    if (_verify.code !== 200) {
+      res.status(_verify.code).send(_verify);
+      return;
+    }
 
     let _result: any = await GetNotifications(wallet);
     res.status(_result.code).send(_result);
