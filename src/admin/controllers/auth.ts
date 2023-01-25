@@ -1,5 +1,9 @@
 import { createToken, verifyToken, refreshToken } from "../libs/jwt";
 import { SaveWallet } from "../business/user";
+import logger from "../../log";
+import { response } from "../../core";
+
+const path = "Admin>controllers>auth>";
 
 class AuthController {
   login = async (req: any, res: any) => {
@@ -101,10 +105,9 @@ class AuthController {
             maxAge: 0,
           })
           .status(result.code)
-          .send({
-            connected: false,
-            message: result.message,
-          });
+          .send({ ...response.error, message: false });
+
+        logger.error(`${path}refreshUser: ${result.message}`);
         return;
       }
 
@@ -117,9 +120,10 @@ class AuthController {
           maxAge: process.env.SECRET_KEY_LIFE_TIME,
         })
         .status(200)
-        .send({ connected: true });
+        .send({ ...response.success, message: true });
     } catch (err: any) {
-      res.status(500).send({ connected: false });
+      res.status(500).send({ ...response.error, message: false });
+      logger.error(`${path}SaveWallet: ${err}`);
     }
   };
 }
