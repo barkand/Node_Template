@@ -1,9 +1,6 @@
 import { createToken, verifyToken, refreshToken } from "../libs/jwt";
 import { SaveWallet } from "../business/user";
-import logger from "../../log";
 import { response } from "../../core";
-
-const path = "Admin>controllers>auth>";
 
 class AuthController {
   login = async (req: any, res: any) => {
@@ -12,7 +9,7 @@ class AuthController {
 
     let _result: any = await SaveWallet(wallet);
     if (_result.code !== 200)
-      res.status(_result.code).send({ ..._result, connected: false });
+      res.status(_result.code).send({ ..._result, data: { connected: false } });
 
     res
       .cookie("wallet", wallet, {
@@ -32,8 +29,8 @@ class AuthController {
         sameSite: "lax",
         maxAge: process.env.REFRESH_SECRET_KEY_LIFE_TIME,
       })
-      .status(200)
-      .send({ connected: true });
+      .status(_result.code)
+      .send({ ..._result, data: { connected: true } });
   };
 
   logout = async (req: any, res: any) => {
@@ -41,7 +38,7 @@ class AuthController {
 
     let _result: any = await SaveWallet(wallet);
     if (_result.code !== 200)
-      res.status(_result.code).send({ ..._result, connected: false });
+      res.status(_result.code).send({ ..._result, data: { connected: false } });
 
     res
       .cookie("wallet", "", {
@@ -59,25 +56,17 @@ class AuthController {
         sameSite: "lax",
         maxAge: 0,
       })
-      .status(200)
-      .send({ connected: false });
+      .status(_result.code)
+      .send({ ..._result, data: { connected: false } });
   };
 
   verifyUser = async (req: any, res: any) => {
     const { token, wallet } = req.cookies;
 
     let result = await verifyToken(token);
-    if (result.code !== 200) {
-      await SaveWallet(wallet);
+    if (result.code !== 200) await SaveWallet(wallet);
 
-      res.status(result.code).send({
-        connected: false,
-        message: result.message,
-      });
-      return;
-    }
-
-    res.status(200).send({ connected: true });
+    res.status(result.code).send(result);
   };
 
   refreshUser = async (req: any, res: any) => {
@@ -105,25 +94,23 @@ class AuthController {
             maxAge: 0,
           })
           .status(result.code)
-          .send({ ...response.error, message: false });
+          .send({ ...response.error, data: { connected: false } });
 
-        logger.error(`${path}refreshUser: ${result.message}`);
         return;
       }
 
       await SaveWallet(wallet);
 
       res
-        .cookie("token", result.token, {
+        .cookie("token", result.data.token, {
           httpOnly: true,
           sameSite: "lax",
           maxAge: process.env.SECRET_KEY_LIFE_TIME,
         })
         .status(200)
-        .send({ ...response.success, message: true });
+        .send({ ...response.success, data: { connected: true } });
     } catch (err: any) {
-      res.status(500).send({ ...response.error, message: false });
-      logger.error(`${path}SaveWallet: ${err}`);
+      res.status(500).send({ ...response.error, data: { connected: false } });
     }
   };
 }

@@ -16,13 +16,19 @@ const createToken = async (wallet: string) => {
 };
 
 const verifyToken = async (token: string) => {
-  let state = { ...response.success, connected: true };
+  let state = { ...response.success, data: { connected: true } };
   if (token === undefined)
-    return { ...response.custom(404, "No Token Found"), connected: false };
+    return {
+      ...response.custom(404, "No Token Found"),
+      data: { connected: false },
+    };
 
   jwt.verify(token, `${process.env.SECRET_KEY}`, (err: any) => {
     if (err)
-      state = { ...response.custom(401, "Invalid Token"), connected: false };
+      state = {
+        ...response.custom(401, "Invalid Token"),
+        data: { connected: false },
+      };
   });
 
   return state;
@@ -30,14 +36,20 @@ const verifyToken = async (token: string) => {
 
 const refreshToken = async (wallet: string, refresh: string) => {
   let payload: any = { wallet: wallet };
-  let state = { ...response.success, token: "" };
+  let state = { ...response.success, data: { token: "" } };
 
   if (refresh === undefined)
-    return { ...response.custom(404, "No Refresh Token Found"), token: "" };
+    return {
+      ...response.custom(404, "No Refresh Token Found"),
+      data: { token: "" },
+    };
 
   jwt.verify(refresh, `${process.env.REFRESH_SECRET_KEY}`, (err: any) => {
     if (err)
-      state = { ...response.custom(403, "Authentication Failed"), token: "" };
+      state = {
+        ...response.custom(403, "Authentication Failed"),
+        data: { token: "" },
+      };
   });
 
   //RefreshToken is valid so sign a new Token
