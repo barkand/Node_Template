@@ -5,9 +5,9 @@ import { response } from "../../core";
 
 const path = "Admin>Business>user>";
 
-const GetUser = async (wallet: string) => {
+const GetUser = async (user_id: string) => {
   try {
-    let user = await Users.findOne({ wallet: wallet });
+    let user = await Users.findOne({ user_id: user_id }, { _id: 0, __v: 0 });
     return { ...response.success, data: user };
   } catch (e: any) {
     logger.error(`${path}GetUser: ${e}`);
@@ -15,37 +15,50 @@ const GetUser = async (wallet: string) => {
   }
 };
 
-const SaveWallet = async (wallet: string) => {
+const SaveUser = async (user_id: string) => {
   try {
-    let user = await Users.findOne({ wallet: wallet });
+    let user = await Users.findOne({ user_id: user_id }, { _id: 0, __v: 0 });
 
     if (!user) {
-      let user = new Users({ wallet: wallet });
+      user = new Users({ user_id: user_id });
       await user.save();
     }
-    return response.success;
+
+    return { ...response.success, data: user };
   } catch (e: any) {
-    logger.error(`${path}SaveWallet: ${e}`);
+    logger.error(`${path}SaveUser: ${e}`);
     return response.error;
   }
 };
 
-const SaveUsername = async (wallet: string, username: string) => {
+const CheckUser = async (user_id: string) => {
+  try {
+    let user = await Users.findOne({ user_id: user_id }, { _id: 0, __v: 0 });
+
+    if (!user) return response.error;
+    return { ...response.success, data: user };
+  } catch (e: any) {
+    logger.error(`${path}SaveUser: ${e}`);
+    return response.error;
+  }
+};
+
+const SaveUsername = async (user_id: string, username: string) => {
   try {
     let user = await Users.findOne({
       username: username,
-      wallet: { $ne: wallet },
+      user_id: { $ne: user_id },
     });
 
     if (user) {
       return response.custom(300, "Username Exist");
     } else {
       await Users.updateOne(
-        { wallet: wallet },
+        { user_id: user_id },
         { $set: { username: username, score: 1 } } //TODO: Score have to Fix
       );
 
-      let user = await Users.findOne({ wallet: wallet });
+      let user = await Users.findOne({ user_id: user_id });
       return {
         ...response.success,
         data: { name: user?.username, score: user?.score },
@@ -57,13 +70,13 @@ const SaveUsername = async (wallet: string, username: string) => {
   }
 };
 
-const SaveAvatar = async (wallet: string) => {
+const SaveAvatar = async (user_id: string) => {
   try {
-    let user = await Users.findOne({ wallet: wallet });
+    let user = await Users.findOne({ user_id: user_id });
 
     if (user) {
       await Users.updateOne(
-        { wallet: wallet },
+        { user_id: user_id },
         { $set: { avatar: true, score: 1 } }
       );
       return response.success;
@@ -74,4 +87,4 @@ const SaveAvatar = async (wallet: string) => {
   }
 };
 
-export { GetUser, SaveWallet, SaveUsername, SaveAvatar };
+export { GetUser, SaveUser, CheckUser, SaveUsername, SaveAvatar };

@@ -8,7 +8,7 @@ import {
 
 class NotifyController {
   saveNotify = async (req: any, res: any) => {
-    const { token, wallet } = req.cookies;
+    const { token, user_id } = req.cookies;
     let { params } = req.body;
     let { notify } = params;
 
@@ -18,12 +18,12 @@ class NotifyController {
       return;
     }
 
-    let _result: any = await SaveNotify(wallet, notify);
+    let _result: any = await SaveNotify(user_id, notify);
     res.status(_result.code).send(_result);
   };
 
   seenNotify = async (req: any, res: any) => {
-    const { token, wallet } = req.cookies;
+    const { token, user_id } = req.cookies;
     let { params } = req.body;
     let { item_id } = params;
 
@@ -33,12 +33,12 @@ class NotifyController {
       return;
     }
 
-    let _result: any = await SeenNotify(wallet, item_id);
+    let _result: any = await SeenNotify(user_id, item_id);
     res.status(_result.code).send(_result);
   };
 
   deleteNotify = async (req: any, res: any) => {
-    const { token, wallet } = req.cookies;
+    const { token, user_id } = req.cookies;
     let { params } = req.body;
     let { item_id } = params;
 
@@ -48,12 +48,12 @@ class NotifyController {
       return;
     }
 
-    let _result: any = await DeleteNotify(wallet, item_id);
+    let _result: any = await DeleteNotify(user_id, item_id);
     res.status(_result.code).send(_result);
   };
 
   getNotifications = async (req: any, res: any) => {
-    const { token, wallet } = req.cookies;
+    const { token, user_id } = req.cookies;
 
     let _verify = await verifyToken(token);
     if (_verify.code !== 200) {
@@ -61,7 +61,7 @@ class NotifyController {
       return;
     }
 
-    let _result: any = await GetNotifications(wallet);
+    let _result: any = await GetNotifications(user_id);
     res.status(_result.code).send(_result);
   };
 }

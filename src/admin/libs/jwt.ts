@@ -2,8 +2,8 @@ import jwt from "jsonwebtoken";
 
 import { response } from "../../core";
 
-const createToken = async (wallet: string) => {
-  let payload: any = { wallet: wallet };
+const createToken = async (user_id: string) => {
+  let payload: any = { user_id: user_id };
 
   const token = jwt.sign(payload, `${process.env.SECRET_KEY}`, {
     expiresIn: `${process.env.SECRET_KEY_LIFE_TIME}`,
@@ -34,8 +34,8 @@ const verifyToken = async (token: string) => {
   return state;
 };
 
-const refreshToken = async (wallet: string, refresh: string) => {
-  let payload: any = { wallet: wallet };
+const refreshToken = async (user_id: string, refresh: string) => {
+  let payload: any = { user_id: user_id };
   let state = { ...response.success, data: { token: "" } };
 
   if (refresh === undefined)

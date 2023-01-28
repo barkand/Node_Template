@@ -5,7 +5,7 @@ import { uploadImage } from "../../core";
 
 class AdminController {
   user = async (req: any, res: any) => {
-    const { token, wallet } = req.cookies;
+    const { token, user_id } = req.cookies;
 
     let _verify = await verifyToken(token);
     if (_verify.code !== 200) {
@@ -13,12 +13,12 @@ class AdminController {
       return;
     }
 
-    let _result = await GetUser(wallet);
+    let _result = await GetUser(user_id);
     res.status(_result.code).send(_result);
   };
 
   uploadImage = async (req: any, res: any) => {
-    const { token, wallet } = req.cookies;
+    const { token, user_id } = req.cookies;
     const image = req.files.file;
 
     let _verify = await verifyToken(token);
@@ -27,18 +27,18 @@ class AdminController {
       return;
     }
 
-    let _upload: any = await uploadImage(image, "users", wallet);
+    let _upload: any = await uploadImage(image, "users", user_id);
     if (_upload.code !== 200) {
       res.status(_upload.code).send(_upload);
       return;
     }
 
-    let _result = await SaveAvatar(wallet);
+    let _result = await SaveAvatar(user_id);
     res.status(_result.code).send(_result);
   };
 
   updateUsername = async (req: any, res: any) => {
-    const { token, wallet } = req.cookies;
+    const { token, user_id } = req.cookies;
     let { params } = req.body;
     let { username } = params;
 
@@ -48,7 +48,7 @@ class AdminController {
       return;
     }
 
-    let _result = await SaveUsername(wallet, username);
+    let _result = await SaveUsername(user_id, username);
     res.status(_result.code).send(_result);
   };
 }

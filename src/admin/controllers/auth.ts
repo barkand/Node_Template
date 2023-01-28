@@ -1,25 +1,25 @@
 import { createToken, verifyToken, refreshToken } from "../libs/jwt";
-import { SaveWallet } from "../business/user";
+import { SaveUser } from "../business/user";
 import { response } from "../../core";
 
 class AuthController {
   login = async (req: any, res: any) => {
     let { params } = req.body;
-    let { wallet } = params;
-    let { token, refresh } = await createToken(wallet);
+    let { user_id } = params;
+    let { token, refresh } = await createToken(user_id);
 
-    let _result: any = await SaveWallet(wallet);
+    let _result: any = await SaveUser(user_id);
     if (_result.code !== 200) {
-      res.status(_result.code).send({ ..._result, data: { connected: false } });
+      res
+        .status(_result.code)
+        .send({ ..._result, data: { ..._result.data, connected: false } });
       return;
     }
 
     res
-      .cookie("wallet", wallet, {
+      .cookie("user_id", user_id, {
         httpOnly: true,
         sameSite: "lax",
-        // secure: true, //TODO: Set Secure
-        // domain : '.',
         maxAge: process.env.REFRESH_SECRET_KEY_LIFE_TIME,
       })
       .cookie("token", token, {
@@ -33,20 +33,12 @@ class AuthController {
         maxAge: process.env.REFRESH_SECRET_KEY_LIFE_TIME,
       })
       .status(_result.code)
-      .send({ ..._result, data: { connected: true } });
+      .send({ ..._result, data: { ..._result.data._doc, connected: true } });
   };
 
   logout = async (req: any, res: any) => {
-    const { wallet } = req.cookies;
-
-    let _result: any = await SaveWallet(wallet);
-    if (_result.code !== 200) {
-      res.status(_result.code).send({ ..._result, data: { connected: false } });
-      return;
-    }
-
     res
-      .cookie("wallet", "", {
+      .cookie("user_id", "", {
         httpOnly: true,
         sameSite: "lax",
         maxAge: 0,
@@ -61,16 +53,19 @@ class AuthController {
         sameSite: "lax",
         maxAge: 0,
       })
-      .status(_result.code)
-      .send({ ..._result, data: { connected: false } });
+      .status(200)
+      .send({
+        ...response.success,
+        data: { user_id: "", connected: false },
+      });
   };
 
   verifyUser = async (req: any, res: any) => {
-    const { token, wallet } = req.cookies;
+    const { token } = req.cookies;
 
     let result = await verifyToken(token);
     if (result.code !== 200) {
-      await SaveWallet(wallet);
+      res.status(result.code).send(result);
       return;
     }
 
@@ -78,15 +73,13 @@ class AuthController {
   };
 
   refreshUser = async (req: any, res: any) => {
-    const { refresh, wallet } = req.cookies;
+    const { refresh, user_id } = req.cookies;
 
     try {
-      let result = await refreshToken(wallet, refresh);
+      let result = await refreshToken(user_id, refresh);
       if (result.code !== 200) {
-        await SaveWallet(wallet);
-
         res
-          .cookie("wallet", "", {
+          .cookie("user_id", "", {
             httpOnly: true,
             sameSite: "lax",
             maxAge: 0,
@@ -106,8 +99,6 @@ class AuthController {
 
         return;
       }
-
-      await SaveWallet(wallet);
 
       res
         .cookie("token", result.data.token, {
