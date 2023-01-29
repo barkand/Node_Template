@@ -16,5 +16,10 @@ declare namespace NodeJS {
     REFRESH_SECRET_KEY_LIFE_TIME: string;
     SITE_PATH: string;
     UPLOAD_FOLDER: string;
+    WAIT_TIME_FOR_CODE: string;
+    MAIL_HOST: string;
+    MAIL_PORT: string;
+    MAIL_FROM: string;
+    MAIL_PASSWORD: string;
   }
 }

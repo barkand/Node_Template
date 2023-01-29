@@ -18,5 +18,6 @@ npm init --yes
 - Test: npm i -D chai mocha chai-http && npm i -D @types/mocha @types/chai-http
 - redis: npm i redis
 - GQL: npm i apollo-server-express express-graphql graphql lodash && npm i -D @types/lodash
+- Mail: npm i nodemailer && npm i -D @types/nodemailer
 
 > npm run start
