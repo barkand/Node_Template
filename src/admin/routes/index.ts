@@ -10,7 +10,9 @@ AdminRouters.use(express.json());
 AdminRouters.get("/", (req: any, res: any) => {
   res.send(
     `
+      /send_code
       /login
+      /login_code
       /logout
       /verify
       /refresh
@@ -27,7 +29,9 @@ AdminRouters.get("/", (req: any, res: any) => {
   );
 });
 
+AdminRouters.post(`/send_code`, authController.sendCode);
 AdminRouters.post(`/login`, authController.login);
+AdminRouters.post(`/login_code`, authController.loginWithCode);
 AdminRouters.post(`/logout`, authController.logout);
 AdminRouters.post(`/verify`, authController.verifyUser);
 AdminRouters.post(`/refresh`, authController.refreshUser);

@@ -1,11 +1,69 @@
 import { createToken, verifyToken, refreshToken } from "../libs/jwt";
-import { SaveUser } from "../business/user";
+import { SaveUser, SaveUserWithCode, CheckCode } from "../business/user";
+import SendMail from "../libs/sendMail";
+
 import { response } from "../../core";
 
 class AuthController {
+  sendCode = async (req: any, res: any) => {
+    let { params } = req.body;
+    let { user_id } = params;
+
+    let _result: any = await SaveUserWithCode(user_id);
+    if (_result.code === 200)
+      SendMail(user_id, "Code", _result.data?.active_code);
+
+    res
+      .status(_result.code)
+      .send({ code: _result.code, message: _result.message });
+  };
+
   login = async (req: any, res: any) => {
     let { params } = req.body;
     let { user_id } = params;
+    let { token, refresh } = await createToken(user_id);
+
+    let _result: any = await SaveUser(user_id);
+    if (_result.code !== 200) {
+      res
+        .status(_result.code)
+        .send({ ..._result, data: { ..._result.data._doc, connected: false } });
+      return;
+    }
+
+    res
+      .cookie("user_id", user_id, {
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: process.env.REFRESH_SECRET_KEY_LIFE_TIME,
+      })
+      .cookie("token", token, {
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: process.env.SECRET_KEY_LIFE_TIME,
+      })
+      .cookie("refresh", refresh, {
+        httpOnly: true,
+        sameSite: "lax",
+        maxAge: process.env.REFRESH_SECRET_KEY_LIFE_TIME,
+      })
+      .status(_result.code)
+      .send({ ..._result, data: { ..._result.data._doc, connected: true } });
+  };
+
+  loginWithCode = async (req: any, res: any) => {
+    let { params } = req.body;
+    let { user_id, code } = params;
+
+    let _result_check: any = await CheckCode(user_id, code);
+    if (_result_check.code !== 200) {
+      res.status(_result_check.code).send({
+        ..._result_check,
+        data: { ..._result_check.data._doc, connected: false },
+      });
+      return;
+    }
+
     let { token, refresh } = await createToken(user_id);
 
     let _result: any = await SaveUser(user_id);

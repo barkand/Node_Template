@@ -1,4 +1,5 @@
 import { Users } from "../models";
+import { GetActiveCode, ValidationCheck } from "../libs/activeCode";
 
 import logger from "../../log";
 import { response } from "../../core";
@@ -31,6 +32,33 @@ const SaveUser = async (user_id: string) => {
   }
 };
 
+const SaveUserWithCode = async (user_id: string) => {
+  try {
+    const { active_code, expire_code }: any = GetActiveCode();
+
+    let user = await Users.findOne({ user_id: user_id }, { _id: 0, __v: 0 });
+
+    if (!user) {
+      user = new Users({
+        user_id: user_id,
+        active_code: active_code,
+        expire_code: expire_code,
+      });
+      await user.save();
+    } else {
+      await Users.updateOne(
+        { user_id: user_id },
+        { $set: { active_code: active_code, expire_code: expire_code } }
+      );
+    }
+
+    return { ...response.success, data: { active_code: active_code } };
+  } catch (e: any) {
+    logger.error(`${path}SaveUserWithCode: ${e}`);
+    return response.error;
+  }
+};
+
 const CheckUser = async (user_id: string) => {
   try {
     let user = await Users.findOne({ user_id: user_id }, { _id: 0, __v: 0 });
@@ -38,7 +66,7 @@ const CheckUser = async (user_id: string) => {
     if (!user) return response.error;
     return { ...response.success, data: user };
   } catch (e: any) {
-    logger.error(`${path}SaveUser: ${e}`);
+    logger.error(`${path}CheckUser: ${e}`);
     return response.error;
   }
 };
@@ -87,4 +115,36 @@ const SaveAvatar = async (user_id: string) => {
   }
 };
 
-export { GetUser, SaveUser, CheckUser, SaveUsername, SaveAvatar };
+const CheckCode = async (user_id: string, code: string) => {
+  try {
+    let user = await Users.findOne(
+      { user_id: user_id, active_code: code },
+      { _id: 0, __v: 0 }
+    );
+
+    if (!user) return response.error;
+
+    let check = ValidationCheck(user.expire_code);
+    if (!check) return response.error;
+
+    await Users.updateOne(
+      { user_id: user_id },
+      { $set: { active_code: null, expire_code: null } }
+    );
+
+    return { ...response.success, data: user };
+  } catch (e: any) {
+    logger.error(`${path}CheckCode: ${e}`);
+    return response.error;
+  }
+};
+
+export {
+  GetUser,
+  SaveUser,
+  SaveUserWithCode,
+  CheckUser,
+  SaveUsername,
+  SaveAvatar,
+  CheckCode,
+};

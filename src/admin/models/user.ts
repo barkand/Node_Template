@@ -7,6 +7,8 @@ const userSchema = new Schema({
   username: { type: String },
   avatar: { type: Boolean },
   score: { type: Number },
+  active_code: { type: String },
+  expire_code: { type: Date },
 });
 
 export default mongoose.model("User", userSchema);
