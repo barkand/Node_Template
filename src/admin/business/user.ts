@@ -61,7 +61,7 @@ const SaveUsername = async (user_id: string, username: string) => {
       let user = await Users.findOne({ user_id: user_id });
       return {
         ...response.success,
-        data: { name: user?.username, score: user?.score },
+        data: { username: user?.username, score: user?.score },
       };
     }
   } catch (e: any) {
