@@ -12,7 +12,7 @@ class AuthController {
     if (_result.code !== 200) {
       res
         .status(_result.code)
-        .send({ ..._result, data: { ..._result.data, connected: false } });
+        .send({ ..._result, data: { ..._result.data._doc, connected: false } });
       return;
     }
 
