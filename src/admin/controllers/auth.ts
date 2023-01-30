@@ -10,7 +10,7 @@ class AuthController {
     let { params } = req.body;
     let { user_id, type } = params;
 
-    let _result: any = await SaveUserWithCode(user_id);
+    let _result: any = await SaveUserWithCode(user_id, type);
     if (_result.code === 200)
       if (type === "mail") SendMail(user_id, "Code", _result.data?.active_code);
       else SendSMS(user_id, _result.data?.active_code);

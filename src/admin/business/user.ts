@@ -21,7 +21,7 @@ const SaveUser = async (user_id: string) => {
     let user = await Users.findOne({ user_id: user_id }, { _id: 0, __v: 0 });
 
     if (!user) {
-      user = new Users({ user_id: user_id });
+      user = new Users({ user_id: user_id, wallet: user_id });
       await user.save();
     }
 
@@ -32,7 +32,7 @@ const SaveUser = async (user_id: string) => {
   }
 };
 
-const SaveUserWithCode = async (user_id: string) => {
+const SaveUserWithCode = async (user_id: string, type: string) => {
   try {
     const { active_code, expire_code }: any = GetActiveCode();
 
@@ -41,6 +41,8 @@ const SaveUserWithCode = async (user_id: string) => {
     if (!user) {
       user = new Users({
         user_id: user_id,
+        mail: type === "mail" ? user_id : null,
+        mobile: type === "mobile" ? user_id : null,
         active_code: active_code,
         expire_code: expire_code,
       });
