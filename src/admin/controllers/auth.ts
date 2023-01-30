@@ -1,17 +1,19 @@
 import { createToken, verifyToken, refreshToken } from "../libs/jwt";
 import { SaveUser, SaveUserWithCode, CheckCode } from "../business/user";
 import SendMail from "../libs/sendMail";
+import SendSMS from "../libs/sendSms";
 
 import { response } from "../../core";
 
 class AuthController {
   sendCode = async (req: any, res: any) => {
     let { params } = req.body;
-    let { user_id } = params;
+    let { user_id, type } = params;
 
     let _result: any = await SaveUserWithCode(user_id);
     if (_result.code === 200)
-      SendMail(user_id, "Code", _result.data?.active_code);
+      if (type === "mail") SendMail(user_id, "Code", _result.data?.active_code);
+      else SendSMS(user_id, _result.data?.active_code);
 
     res
       .status(_result.code)
