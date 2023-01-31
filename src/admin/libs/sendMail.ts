@@ -11,7 +11,6 @@ const SendMail = async (mail_to: string, subject: string, content: string) => {
       pass: process.env.MAIL_PASSWORD,
     },
   };
-  console.log(config);
 
   var transporter: any = createTransport(config);
 
@@ -21,7 +20,6 @@ const SendMail = async (mail_to: string, subject: string, content: string) => {
     subject: `${subject}`,
     html: `${content}`,
   };
-  console.log(mailOptions);
 
   await transporter.sendMail(mailOptions, function (e: any, info: any) {
     if (e) {
