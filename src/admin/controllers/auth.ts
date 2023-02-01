@@ -26,10 +26,17 @@ class AuthController {
     let { token, refresh } = await createToken(user_id);
 
     let _result: any = await SaveUser(user_id);
+    let _data: any = _result.data;
     if (_result.code !== 200) {
-      res
-        .status(_result.code)
-        .send({ ..._result, data: { ..._result.data._doc, connected: false } });
+      res.status(_result.code).send({
+        code: _result.code,
+        message: _result.message,
+        data: {
+          user_id: _data?.user_id,
+          wallet: _data?.wallet,
+          connected: false,
+        },
+      });
       return;
     }
 
@@ -50,7 +57,15 @@ class AuthController {
         maxAge: process.env.REFRESH_SECRET_KEY_LIFE_TIME,
       })
       .status(_result.code)
-      .send({ ..._result, data: { ..._result.data._doc, connected: true } });
+      .send({
+        code: _result.code,
+        message: _result.message,
+        data: {
+          user_id: _data?.user_id,
+          wallet: _data?.wallet,
+          connected: true,
+        },
+      });
   };
 
   loginWithCode = async (req: any, res: any) => {
@@ -58,10 +73,16 @@ class AuthController {
     let { user_id, code } = params;
 
     let _result_check: any = await CheckCode(user_id, code);
+    let _data_check: any = _result_check.data;
     if (_result_check.code !== 200) {
       res.status(_result_check.code).send({
-        ..._result_check,
-        data: { ..._result_check.data._doc, connected: false },
+        code: _result_check.code,
+        message: _result_check.message,
+        data: {
+          user_id: _data_check.user_id,
+          active_code: _data_check.active_code,
+          connected: false,
+        },
       });
       return;
     }
@@ -69,10 +90,17 @@ class AuthController {
     let { token, refresh } = await createToken(user_id);
 
     let _result: any = await SaveUser(user_id);
+    let _data: any = _result.data;
     if (_result.code !== 200) {
-      res
-        .status(_result.code)
-        .send({ ..._result, data: { ..._result.data._doc, connected: false } });
+      res.status(_result.code).send({
+        code: _result.code,
+        message: _result.message,
+        data: {
+          user_id: _data.user_id,
+          active_code: _data.active_code,
+          connected: false,
+        },
+      });
       return;
     }
 
@@ -93,7 +121,15 @@ class AuthController {
         maxAge: process.env.REFRESH_SECRET_KEY_LIFE_TIME,
       })
       .status(_result.code)
-      .send({ ..._result, data: { ..._result.data._doc, connected: true } });
+      .send({
+        code: _result_check.code,
+        message: _result_check.message,
+        data: {
+          user_id: _data_check.user_id,
+          active_code: _data_check.active_code,
+          connected: true,
+        },
+      });
   };
 
   logout = async (req: any, res: any) => {
