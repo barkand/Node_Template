@@ -1,1 +1,1 @@
-export { response, uploadImage, toPascalCase } from "./libs";
+export { response, uploadImage, toPascalCase, SaveFile } from "./libs";
