@@ -22,5 +22,10 @@ declare namespace NodeJS {
     MAIL_PORT: string;
     MAIL_FROM: string;
     MAIL_PASSWORD: string;
+    MOBILE_LINK: string;
+    MOBILE_FROM: string;
+    MOBILE_KEY: string;
+    MOBILE_PATTERN_CODE: string;
+    MOBILE_VAR: string;
   }
 }
