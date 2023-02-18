@@ -28,4 +28,5 @@ coverage
 package-lock.json
 
 public/**/*.webp
+public/metadata
 .env.production
