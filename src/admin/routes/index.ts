@@ -7,28 +7,6 @@ import notifyController from "../controllers/notify";
 const AdminRouters = express.Router();
 AdminRouters.use(express.json());
 
-AdminRouters.get("/", (req: any, res: any) => {
-  res.send(
-    `
-      /send_code
-      /login
-      /login_code
-      /logout
-      /verify
-      /refresh
-
-      /user
-      /upload
-      /update_user
-      
-      /get_notifications
-      /save_notify
-      /seen_notify
-      /delete_notify
-    `
-  );
-});
-
 AdminRouters.post(`/send_code`, authController.sendCode);
 AdminRouters.post(`/login`, authController.login);
 AdminRouters.post(`/login_code`, authController.loginWithCode);

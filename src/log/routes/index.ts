@@ -6,15 +6,6 @@ import clientController from "../controllers/client";
 const LogRouters = express.Router();
 LogRouters.use(express.json());
 
-LogRouters.get("/", (req: any, res: any) => {
-  res.send(
-    `
-      /metrics
-      /client
-    `
-  );
-});
-
 LogRouters.get(`/metrics`, logController.prom);
 LogRouters.use(`/client`, clientController.log);
 
