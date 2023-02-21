@@ -11,6 +11,8 @@ const app = express();
 
 setMiddleware(app);
 
+app.get("/", (_, res) => res.send(""));
+
 app.use("/api", routers);
 
 ConnectToDatabase();
